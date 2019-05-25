@@ -8,7 +8,7 @@ from citepy.classes import CslItem, CslType, CslName
 logger = logging.getLogger(__name__)
 
 
-base_url = 'https://www.pypi.org/pypi'
+base_url = "https://www.pypi.org/pypi"
 
 
 def get_authors(info):
@@ -26,10 +26,10 @@ def get_authors(info):
 
 
 def get(package, version=None) -> CslItem:
-    url = base_url + '/' + package
+    url = base_url + "/" + package
     if version:
-        url += '/' + version
-    url += '/' + 'json'
+        url += "/" + version
+    url += "/" + "json"
 
     logger.debug("Fetching information from %s", url)
 
@@ -45,7 +45,9 @@ def get(package, version=None) -> CslItem:
     first_upload = dt
     for release in data["releases"].values():
         for upload in release:
-            first_upload = min(first_upload, datetime.fromisoformat(upload["upload_time"]))
+            first_upload = min(
+                first_upload, datetime.fromisoformat(upload["upload_time"])
+            )
 
     return CslItem(
         type=CslType.WEBPAGE,
@@ -62,5 +64,5 @@ def get(package, version=None) -> CslItem:
         accessed=datetime.utcnow(),
         categories=["software", "python", "libraries", "pypi"] + info["classifiers"],
         publisher="The Python Package Index",
-        title=package
+        title=package,
     )

@@ -16,7 +16,7 @@ logger = logging.getLogger(__name__)
 
 
 def get_all_versions():
-    return dict(line.strip().split('==') for line in freeze.freeze())
+    return dict(line.strip().split("==") for line in freeze.freeze())
 
 
 def get_versions(*packages, version=None):
@@ -25,11 +25,17 @@ def get_versions(*packages, version=None):
 
 
 def setup_logging(level=logging.DEBUG):
-    logging.getLogger('pip').setLevel(logging.INFO)
-    logging.getLogger('urllib3').setLevel(logging.INFO)
-    logging.getLogger('websockets').setLevel(logging.INFO)
-    logging.getLogger('pyppeteer').setLevel(logging.INFO)
+    logging.getLogger("pip").setLevel(logging.INFO)
+    logging.getLogger("urllib3").setLevel(logging.INFO)
+    logging.getLogger("websockets").setLevel(logging.INFO)
+    logging.getLogger("pyppeteer").setLevel(logging.INFO)
     logging.basicConfig(level=level)
+
+
+def msg_template(e):
+    return "Could not get citation for package '%s'\n" + textwrap.indent(
+        str(e), " " * 4
+    )
 
 
 def get_threaded(fn, package_versions, max_threads):
@@ -46,9 +52,7 @@ def get_threaded(fn, package_versions, max_threads):
             try:
                 out.append(fut.result())
             except Exception as e:
-                logger.exception(
-                    "Could not get citation for package {%s}\n" + textwrap.indent(str(e), ' ' * 4),package
-                )
+                logger.exception(msg_template(e), package)
     return out
 
 
@@ -58,26 +62,38 @@ def get_serial(fn, package_versions):
         try:
             out.append(fn(package, version))
         except Exception as e:
-            logger.exception(
-                "Could not get citation for package {%s}\n" + textwrap.indent(str(e), ' ' * 4), package
-            )
+            logger.exception(msg_template(e), package)
     return out
 
 
 def main():
     parser = argparse.ArgumentParser()
-    parser.add_argument("package", nargs='*', help="names of python packages you want to cite")
     parser.add_argument(
-        "--all", "-a", action="store_true",
-        help="if set, will get information for all python packages accessible to `pip freeze`"
+        "package", nargs="*", help="names of python packages you want to cite"
     )
-    parser.add_argument("--repo", default="pypi", help="which package repository to use (default pypi)")
     parser.add_argument(
-        "--with_version", "-w", help="fetch data for a specific version, not what is currently installed"
+        "--all",
+        "-a",
+        action="store_true",
+        help="if set, will get information for all python packages accessible to `pip freeze`",
     )
-    parser.add_argument("--output", "-o", help="path to write output to (default write to stdout)")
-    parser.add_argument("--format", "-f", default="json", help="format to write out (default json)")
-    parser.add_argument("--threads", "-t", default=5, help="how many threads to use to fetch data")
+    parser.add_argument(
+        "--repo", default="pypi", help="which package repository to use (default pypi)"
+    )
+    parser.add_argument(
+        "--with_version",
+        "-w",
+        help="fetch data for a specific version, not what is currently installed",
+    )
+    parser.add_argument(
+        "--output", "-o", help="path to write output to (default write to stdout)"
+    )
+    parser.add_argument(
+        "--format", "-f", default="json", help="format to write out (default json)"
+    )
+    parser.add_argument(
+        "--threads", "-t", default=5, help="how many threads to use to fetch data"
+    )
 
     parsed = parser.parse_args()
 
@@ -101,7 +117,7 @@ def main():
         raise ValueError(f"Unrecognised output format '{parsed.format}'")
 
     if parsed.output:
-        with open(parsed.output, 'w') as f:
+        with open(parsed.output, "w") as f:
             f.write(s)
     else:
         print(s)
@@ -109,5 +125,5 @@ def main():
     sys.exit(0)
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     main()

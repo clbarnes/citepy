@@ -1,0 +1,25 @@
+language: python
+dist: xenial
+sudo: true
+python: 3.7
+notifications:
+  email: false
+cache: pip
+install:
+- pip install -r requirements.txt
+- pip install .
+script:
+- citepy --help
+- black --check citepy setup.py
+- flake8 --ignore=E501 citepy setup.py
+deploy:
+  on:
+    branch: master
+    repo: clbarnes/citepy
+    python: 3.7
+    tags: true
+  distributions: sdist bdist_wheel
+  password:
+    secure: bUH8tWvDYml+2uPgpjPjcO+vZxPRoMcwq0LjHU59dxGoarCRwAvKKBWSjEc7lV94CtExddLBYUMDv3e8PI3URdfr0kJy0AV5FqvwDHznmvPmw0lqevFIjFFW4LDUbaR5VyRRq0jsM2K1m6Qsv2GW6upZ9Cj+Bn1321Ci1AHG0TEvZzaRDagsOhiw7JYtcNdVQWauWiNZ3uR2N0a52lE/LH/sM40t3zr8JZk97PwlsOe/1kbFldE4WR0UdJydsj7slu66bfvhxYPPguaWV5G1qgKDric/7kCVaaqDqkng5CT8eB08pKRzd2uenCyQbHgd92+xLUlOlRRfs90adC8NrveOwuZvJoj2nPnp5/ETlwNL4PNZGWX8gvKds4aaqPqg3A/U55GyrLXqVavk5rXNdPBNRzg1Kz5ED7QklVFlREL1Ko68OsVSORl57AP6bzRo461HNm62cmUyjemQzMAJ063BaPOUXbc8ZkPLArMqsRKkCeuuFi/NS1kzI2YRFQAA4VrEhps97XjXbEbstQHSZYqaM8h+VUWt7mOOzwS8RkIMJwcVAU/M8A01PyRVxvza7FCphr9Vm3F9nOWkpQ6tnFDOWtId103vN0aOpzUKwJEu2YeJnIKqIZPA6hH1EE8E8cad9TQvgaRdvLIEGiDzXS8F/Ln6vzlCllhS+Qqtegg=
+  provider: pypi
+user: clbarnes

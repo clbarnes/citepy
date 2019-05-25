@@ -6,7 +6,12 @@ from enum import Enum
 from numbers import Number
 from typing import Union, Optional, List, Any, Iterable, Dict
 
-from citepy.validate import type_validator, name_validator, date_validator, item_validator
+from citepy.validate import (
+    type_validator,
+    name_validator,
+    date_validator,
+    item_validator,
+)
 
 StrNum = Union[str, Number]
 StrNumBool = Union[str, Number, bool]
@@ -187,7 +192,9 @@ def normalise_name(obj: ValidName) -> CslName:
         raise TypeError(f"Don't know how to normalise name of type {type(obj)}")
 
 
-def normalise_name_list(obj: Optional[Union[ValidName, Iterable[ValidName]]]) -> Optional[List[CslName]]:
+def normalise_name_list(
+    obj: Optional[Union[ValidName, Iterable[ValidName]]]
+) -> Optional[List[CslName]]:
     if obj is None:
         return obj
 
@@ -316,17 +323,27 @@ class CslItem(CslObject):
         self.short_title: Optional[str] = short_title
 
         self.author: Optional[List[CslName]] = normalise_name_list(author)
-        self.collection_editor: Optional[List[CslName]] = normalise_name_list(collection_editor)
+        self.collection_editor: Optional[List[CslName]] = normalise_name_list(
+            collection_editor
+        )
         self.composer: Optional[List[CslName]] = normalise_name_list(composer)
-        self.container_author: Optional[List[CslName]] = normalise_name_list(container_author)
+        self.container_author: Optional[List[CslName]] = normalise_name_list(
+            container_author
+        )
         self.director: Optional[List[CslName]] = normalise_name_list(director)
         self.editor: Optional[List[CslName]] = normalise_name_list(editor)
-        self.editorial_director: Optional[List[CslName]] = normalise_name_list(editorial_director)
+        self.editorial_director: Optional[List[CslName]] = normalise_name_list(
+            editorial_director
+        )
         self.interviewer: Optional[List[CslName]] = normalise_name_list(interviewer)
         self.illustrator: Optional[List[CslName]] = normalise_name_list(illustrator)
-        self.original_author: Optional[List[CslName]] = normalise_name_list(original_author)
+        self.original_author: Optional[List[CslName]] = normalise_name_list(
+            original_author
+        )
         self.recipient: Optional[List[CslName]] = normalise_name_list(recipient)
-        self.reviewed_author: Optional[List[CslName]] = normalise_name_list(reviewed_author)
+        self.reviewed_author: Optional[List[CslName]] = normalise_name_list(
+            reviewed_author
+        )
         self.translator: Optional[List[CslName]] = normalise_name_list(translator)
 
         self.accessed: Optional[CslDate] = normalise_date(accessed)
@@ -512,7 +529,7 @@ def jso_to_py(jso: Any):
 
     if isinstance(jso, list):
         return [jso_to_py(item) for item in jso]
-    
+
     if isinstance(jso, dict):
         d = dict()
         for k, v in jso.items():

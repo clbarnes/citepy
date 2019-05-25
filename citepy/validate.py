@@ -5,7 +5,7 @@ from copy import deepcopy
 from pathlib import Path
 import logging
 
-from jsonschema import Draft3Validator as Validator
+# from jsonschema import Draft3Validator as Validator
 
 
 logger = logging.getLogger(__name__)
@@ -29,7 +29,7 @@ Validator = DummyValidator
 
 here = Path(__file__).absolute().parent
 
-with open(here / 'csl-data.json') as f:
+with open(here / "csl-data.json") as f:
     data_schema = json.load(f)
 
 data_validator = Validator(data_schema)
