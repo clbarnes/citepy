@@ -3,7 +3,10 @@ from datetime import datetime
 import logging
 
 from citepy.classes import CslItem, CslType, CslName
+from citepy.repos.common import KNOWN_SITES as common_known, get_publisher
 
+KNOWN_SITES = common_known.copy()
+KNOWN_SITES.update({"pypi": "The Python Package Index"})
 
 logger = logging.getLogger(__name__)
 
@@ -49,11 +52,14 @@ def get(package, version=None) -> CslItem:
                 first_upload, datetime.fromisoformat(upload["upload_time"])
             )
 
+    item_url = info.get("home_page") or info["project_url"]
+    publisher = get_publisher(item_url, KNOWN_SITES)
+
     return CslItem(
         type=CslType.WEBPAGE,
         id=package,
         author=get_authors(info),
-        URL=info.get("home_page") or info["project_url"],
+        URL=item_url,
         abstract=info["summary"] or None,
         version=info["version"],
         issued=dt,
@@ -63,6 +69,6 @@ def get(package, version=None) -> CslItem:
         original_date=first_upload,
         accessed=datetime.utcnow(),
         categories=["software", "python", "libraries", "pypi"] + info["classifiers"],
-        publisher="The Python Package Index",
+        publisher=publisher,
         title=package,
     )
