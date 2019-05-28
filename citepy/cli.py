@@ -59,7 +59,7 @@ def get_threaded(fn, package_versions, max_threads):
     threads = min(len(package_versions), max_threads)
     futs: List[Tuple[str, Future]] = []
     with ThreadPoolExecutor(max_workers=threads) as exe:
-        for package, version in package_versions:
+        for package, version in package_versions.items():
             fut = exe.submit(fn, package, version)
             futs.append((package, fut))
 
@@ -87,7 +87,7 @@ def split_package_versions(packages):
     for s in packages:
         pair = s.split("==")
         if len(pair) == 1:
-            p = pair
+            p = pair[0]
             v = None
         elif len(pair) == 2:
             p, v = pair

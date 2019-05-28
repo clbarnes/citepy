@@ -3,6 +3,7 @@ from __future__ import annotations
 import json
 from datetime import date
 from enum import Enum
+from json import JSONDecodeError
 from numbers import Number
 from typing import Union, Optional, List, Any, Iterable, Dict
 
@@ -15,10 +16,6 @@ from citepy.validate import (
 
 StrNum = Union[str, Number]
 StrNumBool = Union[str, Number, bool]
-
-
-class JSONDecoderError(object):
-    pass
 
 
 class CslObject:
@@ -64,7 +61,7 @@ class CslObject:
         if isinstance(other, str):
             try:
                 other_jso = json.loads(other)
-            except JSONDecoderError:
+            except JSONDecodeError:
                 return False
         elif isinstance(other, CslObject):
             other_jso = other.to_jso()
