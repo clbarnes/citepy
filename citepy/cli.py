@@ -42,7 +42,7 @@ def setup_logging(verbosity):
 
     logging.basicConfig(level=levels[v_idx])
 
-    if v_idx <= 2:
+    if v_idx > 2:
         logging.getLogger("pip").setLevel(logging.INFO)
         logging.getLogger("urllib3").setLevel(logging.INFO)
         logging.getLogger("websockets").setLevel(logging.INFO)
