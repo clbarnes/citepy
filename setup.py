@@ -9,7 +9,7 @@ with open(here / "README.md") as f:
 
 setup(
     name="citepy",
-    version="0.1.1",
+    version="0.2.0",
     packages=["citepy", "citepy.repos"],
     url="https://www.github.com/clbarnes/citepy",
     license="MIT",
