@@ -133,7 +133,9 @@ def main():
         help="Increase verbosity of logging (can be repeated). "
         "One for DEBUG, two for NOTSET, three includes all library logging.",
     )
-    parser.add_argument("--version", help="print version information and exit")
+    parser.add_argument(
+        "--version", action="store_true", help="print version information and exit"
+    )
 
     parsed = parser.parse_args()
 
