@@ -1,9 +1,9 @@
 jsonschema
 requests
-setuptools==41.0.1
-wheel==0.33.4
-twine==1.13.0
-pre-commit==1.16.1
-flake8==3.7.7
-bump2version==0.5.10
+setuptools==41.2.0
+wheel==0.33.6
+twine==1.15.0
+pre-commit==1.18.3
+flake8==3.7.8
+bump2version==0.5.11
 black
