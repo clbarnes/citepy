@@ -2,7 +2,7 @@ jsonschema
 requests
 setuptools==41.4.0
 wheel==0.33.6
-twine==1.15.0
+twine==2.0.0
 pre-commit==1.18.3
 flake8==3.7.8
 bump2version==0.5.11
