@@ -6,8 +6,17 @@ Easily cite software libraries using information from automatically gathered fro
 
 ## Installation
 
+For installing python-based system tools, I recommend [pipx](https://pipxproject.github.io/pipx/).
+With pipx installed:
+
+```sh
+pipx install citepy
+```
+
+If you only have pip available:
+
 ```bash
-pip install citepy
+pip install --user citepy
 ```
 
 ## Usage
@@ -51,3 +60,69 @@ optional arguments:
 - CSL-data JSON
 
 CSL-data can be converted into bibtex, HTML, or a plaintext bibliography using another tool, e.g. [citation-js](https://github.com/larsgw/citation.js/).
+
+## Example
+
+To get a CSL-data JSON representation of the citation information of this package:
+
+```sh
+citepy citepy
+```
+
+```json
+[
+  {
+    "URL": "https://www.github.com/clbarnes/citepy",
+    "abstract": "Automatically create citations for packages",
+    "accessed": {
+      "date-parts": [
+        [
+          2020,
+          3,
+          2
+        ]
+      ]
+    },
+    "author": [
+      {
+        "literal": "Chris L. Barnes"
+      }
+    ],
+    "categories": [
+      "software",
+      "python",
+      "libraries",
+      "pypi"
+    ],
+    "id": "citepy",
+    "issued": {
+      "date-parts": [
+        [
+          2019,
+          5,
+          28
+        ]
+      ]
+    },
+    "original-date": {
+      "date-parts": [
+        [
+          2019,
+          5,
+          25
+        ]
+      ]
+    },
+    "publisher": "GitHub",
+    "title": "citepy",
+    "type": "webpage",
+    "version": "0.2.3"
+  }
+]
+```
+
+## Limitations
+
+- Author names are not parsed, and are therefore taken as literals
+- If the package has its own citation information (as numpy, scipy, astropy etc do), citepy will not pick it up - it just uses the package publication metadata
+- Software libraries do not fit into the CSL or bibtex categories very well, and so are cited as the web pages which host them
