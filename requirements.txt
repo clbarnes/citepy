@@ -1,6 +1,6 @@
 jsonschema
 requests
-setuptools==47.3.1
+setuptools==49.2.0
 wheel==0.34.2
 twine==3.2.0
 pre-commit==2.6.0
