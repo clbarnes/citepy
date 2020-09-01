@@ -1,7 +1,7 @@
 jsonschema
 requests
 setuptools==49.2.1
-wheel==0.34.2
+wheel==0.35.1
 twine==3.2.0
 pre-commit==2.6.0
 flake8==3.8.3
