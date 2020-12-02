@@ -2,14 +2,12 @@ from setuptools import setup
 from pathlib import Path
 
 here = Path(__file__).absolute().parent
-package = here / "fran"
 
 with open(here / "README.md") as f:
     long_description = f.read()
 
 setup(
     name="citepy",
-    version="0.2.3",
     packages=["citepy", "citepy.repos"],
     url="https://www.github.com/clbarnes/citepy",
     license="MIT",
@@ -20,8 +18,10 @@ setup(
     package_data={"citepy": ["csl-data.json"]},
     long_description=long_description,
     long_description_content_type="text/markdown",
-    python_requires=">=3.7",
+    python_requires=">=3.7,<4",
     entry_points={
         "console_scripts": ["citepy = citepy.cli:main", "cite = citepy.cli:main"]
     },
+    use_scm_version=True,
+    setup_requires=["setuptools_scm"],
 )
