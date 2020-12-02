@@ -12,7 +12,7 @@ setup(
     url="https://www.github.com/clbarnes/citepy",
     license="MIT",
     author="Chris L. Barnes",
-    author_email="barnesc@janelia.hhmi.org",
+    author_email="cbarnes@mrc-lmb.cam.ac.uk",
     description="Automatically create citations for packages",
     install_requires=["jsonschema", "requests"],
     package_data={"citepy": ["csl-data.json"]},

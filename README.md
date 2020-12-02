@@ -23,9 +23,8 @@ pip install --user citepy
 
 ```help
 usage: citepy [-h] [--all] [--repo {pypi,crates}] [--output OUTPUT]
-              [--format FORMAT] [--threads THREADS] [--verbose]
-              [--version VERSION]
-              [package [package ...]]
+              [--format FORMAT] [--threads THREADS] [--verbose] [--version]
+              [package ...]
 
 positional arguments:
   package               names of python packages you want to cite, optionally
@@ -47,7 +46,7 @@ optional arguments:
   --verbose, -v         Increase verbosity of logging (can be repeated). One
                         for DEBUG, two for NOTSET, three includes all library
                         logging.
-  --version VERSION     print version information and exit
+  --version             print version information and exit
 ```
 
 ### Supported package repos
@@ -78,7 +77,7 @@ citepy citepy
       "date-parts": [
         [
           2020,
-          3,
+          12,
           2
         ]
       ]
