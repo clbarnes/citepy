@@ -1,4 +1,6 @@
+from abc import ABC, abstractmethod
 from urllib.parse import urlparse
+from ..classes import CslItem
 
 KNOWN_SITES = {
     "github": "GitHub",
@@ -23,3 +25,9 @@ def get_publisher(url, known_sites=None):
     if netloc.startswith("www"):
         netloc = ".".join(netloc.split(".")[1:])
     return netloc
+
+
+class DataFetcher(ABC):
+    @abstractmethod
+    async def get(self, package, version=None) -> CslItem:
+        pass

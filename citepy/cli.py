@@ -1,38 +1,35 @@
 import argparse
-import importlib
 import json
 import sys
 import logging
-from concurrent.futures import Future
-from concurrent.futures.thread import ThreadPoolExecutor
-from typing import List, Tuple
-
-from pip._internal.operations import freeze
+from typing import Dict, Optional
+import re
+from contextlib import contextmanager
+from pip._internal.operations.freeze import freeze as pip_freeze
 import textwrap
+import asyncio
+
+import httpx
 
 from citepy import __version__
-from citepy.classes import CslItem
+from citepy.repos import KNOWN_FETCHERS
 
 logger = logging.getLogger(__name__)
 
 
-SUPPORTED_REPOS = ["pypi", "crates"]
+DEFAULT_JOBS = 5
 
 
-def get_pypi_versions():
+def get_pypi_versions() -> Dict[str, Optional[str]]:
+    """Get versions from ``pip freeze``"""
     d = dict()
-    for line in freeze.freeze():
+    for line in pip_freeze():
         try:
             k, v = line.strip().split("==")
         except ValueError:
             continue
         d[k] = v
     return d
-
-
-def get_versions(*packages, version=None):
-    versions = get_pypi_versions()
-    return {p: version if version else versions.get(p) for p in packages}
 
 
 def setup_logging(verbosity):
@@ -55,45 +52,61 @@ def msg_template(e):
     )
 
 
-def get_threaded(fn, package_versions, max_threads):
-    threads = min(len(package_versions), max_threads)
-    futs: List[Tuple[str, Future]] = []
-    with ThreadPoolExecutor(max_workers=threads) as exe:
-        for package, version in package_versions.items():
-            fut = exe.submit(fn, package, version)
-            futs.append((package, fut))
-
-        out: List[CslItem] = []
-        fut: Future
-        for package, fut in futs:
-            try:
-                out.append(fut.result())
-            except Exception as e:
-                logger.exception(msg_template(e), package)
-    return out
-
-
-def get_serial(fn, package_versions):
-    out = []
-    for package, version in package_versions:
-        try:
-            out.append(fn(package, version))
-        except Exception as e:
-            logger.exception(msg_template(e), package)
-    return out
+name_re = re.compile(
+    r"^(?P<name>(\w[\w\d\._-]*))\s*((?P<rel>[=><!~^]{1,2})\s*(?P<ver>[\d\.\*\w-]+))?$"
+)
 
 
 def split_package_versions(packages):
     for s in packages:
-        pair = s.split("==")
-        if len(pair) == 1:
-            p = pair[0]
-            v = None
-        elif len(pair) == 2:
-            p, v = pair
-        else:
-            raise ValueError(f"Could not parse '{s}'")
-        yield p, v
+        s = s.strip()
+        if s == "-":
+            yield from split_package_versions(sys.stdin.readlines())
+            continue
+
+        m = name_re.match(s)
+        if m is None:
+            logger.warning("Could not parse '%s'; skipping", s)
+            continue
+
+        g = m.groupdict()
+        name = g["name"]
+        rel = g["rel"]
+        ver = g["ver"]
+
+        if rel:
+            if set(rel) == {"="} and len(rel) <= 2:
+                yield name, ver
+                continue
+            else:
+                logger.warning(
+                    f"Unsupported package-version relationship '{rel}'; ignoring version"
+                )
+        yield name, None
+
+
+async def get_info(
+    package_versions: Dict[str, Optional[str]], repo: str, jobs=DEFAULT_JOBS
+):
+    fetcher_cls = KNOWN_FETCHERS[repo]
+    # sem = asyncio.Semaphore(jobs)
+    futs = []
+    async with httpx.AsyncClient() as c:
+        fetcher = fetcher_cls(c)
+        for k, v in package_versions.items():
+            # async with sem:
+            futs.append(fetcher.get(k, v))
+        results = await asyncio.gather(*futs)
+    return results
+
+
+@contextmanager
+def outfile(obj):
+    if not obj or obj == "-":
+        yield sys.stdout
+    else:
+        with open(obj, "w") as f:
+            yield f
 
 
 def main():
@@ -101,11 +114,16 @@ def main():
     parser.add_argument(
         "package",
         nargs="*",
-        help="names of python packages you want to cite, optionally with (full) version string. "
-        "e.g. numpy==1.16.3 beautifulsoup4==4.7.1",
+        help=(
+            "names of packages you want to cite, optionally with (full) version string. "
+            "e.g. numpy==1.16.3 beautifulsoup4==4.7.1 . "
+            "Note that version strings are handled differently "
+            "by different repositories, and may be ignored. "
+            "In particular, any non-exact version constraint is ignored."
+        ),
     )
     parser.add_argument(
-        "--all",
+        "--all-python",
         "-a",
         action="store_true",
         help="if set, will get information for all python packages accessible to `pip freeze`",
@@ -114,18 +132,22 @@ def main():
         "--repo",
         "-r",
         default="pypi",
-        choices=SUPPORTED_REPOS,
+        choices=sorted(KNOWN_FETCHERS),
         help="which package repository to use (default pypi)",
     )
     parser.add_argument(
         "--output", "-o", help="path to write output to (default write to stdout)"
     )
-    parser.add_argument(
-        "--format", "-f", default="json", help="format to write out (default json)"
-    )
-    parser.add_argument(
-        "--threads", "-t", default=5, help="how many threads to use to fetch data"
-    )
+    # parser.add_argument(
+    #     "--format", "-f", default="csl-json", choices=("csl-json",), help="format to write out (default 'csl-json')"
+    # )
+    # parser.add_argument(
+    #     "--jobs",
+    #     "-j",
+    #     type=int,
+    #     default=DEFAULT_JOBS,
+    #     help=f"Number of concurrent requests to make (default {DEFAULT_JOBS})",
+    # )
     parser.add_argument(
         "--verbose",
         "-v",
@@ -145,8 +167,6 @@ def main():
         print(__version__)
         sys.exit(0)
 
-    mod = importlib.import_module("citepy.repos." + parsed.repo)
-
     if parsed.repo == "pypi":
         versions = get_pypi_versions()
         if parsed.package:
@@ -159,18 +179,16 @@ def main():
     else:
         package_versions = dict(split_package_versions(parsed.package))
 
-    csl_items = get_threaded(mod.get, package_versions, parsed.threads)
+    csl_items = asyncio.run(get_info(package_versions, parsed.repo))  # , parsed.jobs))
+    s = json.dumps([item.to_jso() for item in csl_items], indent=2, sort_keys=True)
 
-    if parsed.format.lower() == "json":
-        s = json.dumps([item.to_jso() for item in csl_items], indent=2, sort_keys=True)
-    else:
-        raise ValueError(f"Unrecognised output format '{parsed.format}'")
+    # if parsed.format.lower() == "json":
+    #     s = json.dumps([item.to_jso() for item in csl_items], indent=2, sort_keys=True)
+    # else:
+    #     raise ValueError(f"Unrecognised output format '{parsed.format}'")
 
-    if parsed.output:
-        with open(parsed.output, "w") as f:
-            f.write(s)
-    else:
-        print(s)
+    with outfile(parsed.output) as f:
+        print(s, file=f, flush=True)
 
     sys.exit(0)
 
