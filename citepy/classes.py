@@ -41,7 +41,8 @@ class CslObject:
         #     with suppress(KeyError):  # Assume un-annotated parameters can be any type
         #         value = getattr(self, attr_name)
         #         if isinstance(type_hint, _SpecialForm):
-        #             # No check for typing.Any, typing.Union, typing.ClassVar (without parameters)
+        #             # No check for typing.Any, typing.Union, typing.ClassVar
+        #             # (without parameters)
         #             continue
         #         try:
         #             actual_type = type_hint.__origin__
@@ -52,7 +53,11 @@ class CslObject:
         #             actual_type = type_hint.__args__
         #
         #         if not isinstance(value, actual_type):
-        #             raise TypeError('Unexpected type for \'{}\' (expected {} but found {})'.format(name, type_hint, type(value)))
+        #             raise TypeError(
+        #                 "Unexpected type for '{}\ (expected {} but found {})".format(
+        #                     name, type_hint, type(value)
+        #                 )
+        #             )
 
     def __str__(self):
         return json.dumps(self.to_jso())

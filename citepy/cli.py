@@ -80,7 +80,8 @@ def split_package_versions(packages):
                 continue
             else:
                 logger.warning(
-                    f"Unsupported package-version relationship '{rel}'; ignoring version"
+                    f"Unsupported package-version relationship '{rel}'; "
+                    "ignoring version"
                 )
         yield name, None
 
@@ -115,7 +116,8 @@ def main():
         "package",
         nargs="*",
         help=(
-            "names of packages you want to cite, optionally with (full) version string. "
+            "names of packages you want to cite, "
+            "optionally with (full) version string. "
             "e.g. numpy==1.16.3 beautifulsoup4==4.7.1 . "
             "Note that version strings are handled differently "
             "by different repositories, and may be ignored. "
@@ -126,7 +128,10 @@ def main():
         "--all-python",
         "-a",
         action="store_true",
-        help="if set, will get information for all python packages accessible to `pip freeze`",
+        help=(
+            "if set, will get information for all python packages "
+            "accessible to `pip freeze`"
+        ),
     )
     parser.add_argument(
         "--repo",
@@ -139,7 +144,11 @@ def main():
         "--output", "-o", help="path to write output to (default write to stdout)"
     )
     # parser.add_argument(
-    #     "--format", "-f", default="csl-json", choices=("csl-json",), help="format to write out (default 'csl-json')"
+    #     "--format",
+    #     "-f",
+    #     default="csl-json",
+    #     choices=("csl-json",),
+    #     help="format to write out (default 'csl-json')",
     # )
     # parser.add_argument(
     #     "--jobs",
@@ -183,7 +192,11 @@ def main():
     s = json.dumps([item.to_jso() for item in csl_items], indent=2, sort_keys=True)
 
     # if parsed.format.lower() == "json":
-    #     s = json.dumps([item.to_jso() for item in csl_items], indent=2, sort_keys=True)
+    #     s = json.dumps(
+    #         [item.to_jso() for item in csl_items],
+    #         indent=2,
+    #         sort_keys=True
+    #     )
     # else:
     #     raise ValueError(f"Unrecognised output format '{parsed.format}'")
 
