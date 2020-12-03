@@ -1,4 +1,5 @@
 from __future__ import annotations
+from abc import ABC
 
 import json
 from datetime import date
@@ -8,7 +9,7 @@ from numbers import Number
 from typing import Union, Optional, List, Any, Iterable, Dict
 
 from citepy.validate import (
-    type_validator,
+    Validator, type_validator,
     name_validator,
     date_validator,
     item_validator,
@@ -18,8 +19,8 @@ StrNum = Union[str, Number]
 StrNumBool = Union[str, Number, bool]
 
 
-class CslObject:
-    _validator = None
+class CslObject(ABC):
+    _validator: Validator
 
     def __init__(self, **kwargs):
         self._check_types()
