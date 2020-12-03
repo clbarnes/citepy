@@ -4,3 +4,11 @@ readme: install-dev
 
 install-dev:
 	pip install -e .
+
+fmt:
+	black .
+
+lint:
+	flake8 .
+	black --check .
+	mypy --ignore-missing-imports .
