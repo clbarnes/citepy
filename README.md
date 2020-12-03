@@ -22,27 +22,26 @@ pip install --user citepy
 ## Usage
 
 ```help
-usage: citepy [-h] [--all] [--repo {pypi,crates}] [--output OUTPUT]
-              [--format FORMAT] [--threads THREADS] [--verbose] [--version]
+usage: citepy [-h] [--all-python] [--repo {crates,pypi}] [--output OUTPUT]
+              [--verbose] [--version]
               [package ...]
 
 positional arguments:
-  package               names of python packages you want to cite, optionally
-                        with (full) version string. e.g. numpy==1.16.3
-                        beautifulsoup4==4.7.1
+  package               names of packages you want to cite, optionally with
+                        (full) version string. e.g. numpy==1.16.3
+                        beautifulsoup4==4.7.1 . Note that version strings are
+                        handled differently by different repositories, and may
+                        be ignored. In particular, any non-exact version
+                        constraint is ignored.
 
 optional arguments:
   -h, --help            show this help message and exit
-  --all, -a             if set, will get information for all python packages
+  --all-python, -a      if set, will get information for all python packages
                         accessible to `pip freeze`
-  --repo {pypi,crates}, -r {pypi,crates}
+  --repo {crates,pypi}, -r {crates,pypi}
                         which package repository to use (default pypi)
   --output OUTPUT, -o OUTPUT
                         path to write output to (default write to stdout)
-  --format FORMAT, -f FORMAT
-                        format to write out (default json)
-  --threads THREADS, -t THREADS
-                        how many threads to use to fetch data
   --verbose, -v         Increase verbosity of logging (can be repeated). One
                         for DEBUG, two for NOTSET, three includes all library
                         logging.
@@ -51,8 +50,8 @@ optional arguments:
 
 ### Supported package repos
 
-- PyPI
-- crates.io
+- PyPI (`pypi`)
+- crates.io (`crates`)
 
 ### Supported output formats
 
@@ -78,7 +77,7 @@ citepy citepy
         [
           2020,
           12,
-          2
+          3
         ]
       ]
     },
