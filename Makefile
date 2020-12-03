@@ -11,4 +11,4 @@ fmt:
 lint:
 	flake8 .
 	black --check .
-	mypy --ignore-missing-imports .
+	# mypy --ignore-missing-imports .

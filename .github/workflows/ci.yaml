@@ -16,7 +16,7 @@ jobs:
       - run: pip install $(grep -E '^(black|flake8|mypy)' requirements.txt)
       - run: flake8 .
       - run: black . --check
-      - run: mypy --ignore-missing-imports .
+      # - run: mypy --ignore-missing-imports .
 
   test:
     runs-on: ubuntu-18.04

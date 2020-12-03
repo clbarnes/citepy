@@ -9,7 +9,8 @@ from numbers import Number
 from typing import Union, Optional, List, Any, Iterable, Dict
 
 from citepy.validate import (
-    Validator, type_validator,
+    Validator,
+    type_validator,
     name_validator,
     date_validator,
     item_validator,
@@ -467,7 +468,7 @@ class CslNameList:
         return [CslName.from_jso(item) for item in lst]
 
 
-name_to_class = {
+name_to_class: Dict[str, Any] = {
     "type": CslType,
     "author": CslNameList,
     "collection-editor": CslNameList,
