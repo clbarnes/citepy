@@ -86,7 +86,7 @@ class CranDataFetcher(DataFetcher):
             logger.warning(
                 "Using metadata for version '%s' not requested '%s'",
                 info_version,
-                version
+                version,
             )
 
         info_url = info.get("URL", url).split(" , ")[0]

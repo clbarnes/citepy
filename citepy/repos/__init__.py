@@ -12,4 +12,10 @@ KNOWN_FETCHERS: Dict[str, Type[DataFetcher]] = {
     "cran": CranDataFetcher,
 }
 
-__all__ = ["PypiDataFetcher", "CratesDataFetcher", "CranDataFetcher", "KNOWN_FETCHERS", "DataFetcher"]
+__all__ = [
+    "PypiDataFetcher",
+    "CratesDataFetcher",
+    "CranDataFetcher",
+    "KNOWN_FETCHERS",
+    "DataFetcher",
+]
