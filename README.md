@@ -22,9 +22,10 @@ pip install --user citepy
 ## Usage
 
 ```help
-usage: citepy [-h] [--all-python] [--repo {crates,pypi}] [--infile INFILE]
-              [--outfile OUTFILE] [--verbose] [--date-accessed DATE_ACCESSED]
-              [--version]
+usage: citepy [-h] [--all-python] [--repo {cran,crates,pypi}]
+              [--infile INFILE] [--outfile OUTFILE]
+              [--format {csl-json/lines,csl-json/min,csl-json/pretty}]
+              [--verbose] [--date-accessed DATE_ACCESSED] [--version]
               [package ...]
 
 positional arguments:
@@ -39,7 +40,7 @@ optional arguments:
   -h, --help            show this help message and exit
   --all-python, -a      if set, will get information for all python packages
                         accessible to `pip freeze`
-  --repo {crates,pypi}, -r {crates,pypi}
+  --repo {cran,crates,pypi}, -r {cran,crates,pypi}
                         which package repository to use (default pypi)
   --infile INFILE, -i INFILE
                         path to read input packages from as newline-separated
@@ -48,6 +49,8 @@ optional arguments:
   --outfile OUTFILE, -o OUTFILE
                         path to write output to (default or - writes to
                         stdout)
+  --format {csl-json/lines,csl-json/min,csl-json/pretty}, -f {csl-json/lines,csl-json/min,csl-json/pretty}
+                        format to write out (default 'csl-json/pretty')
   --verbose, -v         Increase verbosity of logging (can be repeated). One
                         for DEBUG, two for NOTSET, three includes all library
                         logging.
@@ -106,9 +109,9 @@ citepy citepy
     "issued": {
       "date-parts": [
         [
-          2019,
-          5,
-          28
+          2021,
+          2,
+          2
         ]
       ]
     },
@@ -124,7 +127,7 @@ citepy citepy
     "publisher": "GitHub",
     "title": "citepy",
     "type": "webpage",
-    "version": "0.2.3"
+    "version": "0.3.2"
   }
 ]
 ```
@@ -142,3 +145,4 @@ citepy citepy
     - This is a "wontfix". Author names *should* be literals. A huge amount of complexity is added to tools which attempt, and fail, to encode the complexity of different cultural conventions around handling names.
 - If the package has its own citation information (as numpy, scipy, astropy etc do), citepy will not pick it up - it just uses the package publication metadata
 - Software libraries do not fit into the CSL or bibtex categories very well, and so are cited as the web pages which host them
+

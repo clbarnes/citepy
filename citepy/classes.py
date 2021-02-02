@@ -77,6 +77,9 @@ class CslObject(ABC):
 
         return self.to_jso() == other_jso
 
+    def __hash__(self) -> int:
+        return hash(json.dumps(self.to_jso(), sort_keys=True))
+
 
 class CslType(Enum):
     ARTICLE = "article"
