@@ -10,7 +10,7 @@ KNOWN_SITES.update({"cran": "The Comprehensive R Archive Network"})
 logger = logging.getLogger(__name__)
 
 
-class PypiDataFetcher(DataFetcher):
+class CranDataFetcher(DataFetcher):
     base_url = "https://CRAN.R-project.org"
 
     def get_authors(self, info):
