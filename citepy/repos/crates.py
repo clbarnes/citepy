@@ -25,7 +25,7 @@ class CratesDataFetcher(DataFetcher):
         names = author_response.json()["meta"]["names"]
         return issued, [CslName(literal=name) for name in names]
 
-    async def get(self, package, version=None) -> CslItem:
+    async def get(self, package, version=None, date_accessed=None) -> CslItem:
         api_url = self.base_url + "/api/v1/crates/" + package
 
         logger.debug("Fetching information from %s", api_url)
@@ -70,7 +70,7 @@ class CratesDataFetcher(DataFetcher):
             issued=issued,
             original_author=original_authors,
             original_date=datetime.fromisoformat(crate_data["created_at"]),
-            accessed=datetime.utcnow(),
+            accessed=date_accessed,
             categories=categories,
             publisher=get_publisher(item_url, KNOWN_SITES),
             title=crate_data.get("name", package),

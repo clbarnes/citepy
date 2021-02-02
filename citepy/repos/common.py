@@ -1,5 +1,6 @@
 from abc import ABC, abstractmethod
 from urllib.parse import urlparse
+import datetime as dt
 
 import httpx
 
@@ -37,5 +38,7 @@ class DataFetcher(ABC):
         self.client = client
 
     @abstractmethod
-    async def get(self, package, version=None) -> CslItem:
+    async def get(
+        self, package, version: str = None, date_accessed: dt.date = None
+    ) -> CslItem:
         pass

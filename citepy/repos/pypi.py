@@ -27,7 +27,7 @@ class PypiDataFetcher(DataFetcher):
 
         return authors
 
-    async def get(self, package, version=None) -> CslItem:
+    async def get(self, package, version=None, date_accessed=None) -> CslItem:
         url = self.base_url + "/" + package
         if version:
             url += "/" + version
@@ -66,7 +66,7 @@ class PypiDataFetcher(DataFetcher):
             # container=dt,
             # submitted=dt,
             original_date=first_upload,
-            accessed=datetime.utcnow(),
+            accessed=date_accessed,
             categories=(
                 ["software", "python", "libraries", "pypi"] + info["classifiers"]
             ),

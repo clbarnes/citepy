@@ -8,6 +8,8 @@ from contextlib import contextmanager
 from pip._internal.operations.freeze import freeze as pip_freeze
 import textwrap
 import asyncio
+import datetime as dt
+import os
 
 import httpx
 
@@ -16,7 +18,8 @@ from citepy.repos import KNOWN_FETCHERS
 
 logger = logging.getLogger(__name__)
 
-
+DATE_ACCESSED_VAR = "CITEPY_DATE_ACCESSED"
+DEFAULT_DATE_STR = os.environ.get(DATE_ACCESSED_VAR, dt.date.today().isoformat())
 DEFAULT_JOBS = 5
 
 
@@ -87,7 +90,7 @@ def split_package_versions(packages):
 
 
 async def get_info(
-    package_versions: Dict[str, Optional[str]], repo: str, jobs=DEFAULT_JOBS
+    package_versions: Dict[str, Optional[str]], repo: str, date: dt.date = None
 ):
     fetcher_cls = KNOWN_FETCHERS[repo]
     # sem = asyncio.Semaphore(jobs)
@@ -96,7 +99,7 @@ async def get_info(
         fetcher = fetcher_cls(c)
         for k, v in package_versions.items():
             # async with sem:
-            futs.append(fetcher.get(k, v))
+            futs.append(fetcher.get(k, v, date))
         results = await asyncio.gather(*futs)
     return results
 
@@ -108,6 +111,11 @@ def outfile(obj):
     else:
         with open(obj, "w") as f:
             yield f
+
+
+def parse_date(s: str) -> dt.date:
+    datetime = dt.datetime.strptime(s, "%Y-%m-%d")
+    return datetime.date()
 
 
 def main():
@@ -165,6 +173,17 @@ def main():
         "One for DEBUG, two for NOTSET, three includes all library logging.",
     )
     parser.add_argument(
+        "--date-accessed",
+        "-d",
+        type=parse_date,
+        default=parse_date(DEFAULT_DATE_STR),
+        help=(
+            "Manually set access date, in format 'YYYY-MM-DD'. "
+            f"Falls back to {DATE_ACCESSED_VAR} environment variable, "
+            "then today's date."
+        ),
+    )
+    parser.add_argument(
         "--version", action="store_true", help="print version information and exit"
     )
 
@@ -188,7 +207,9 @@ def main():
     else:
         package_versions = dict(split_package_versions(parsed.package))
 
-    csl_items = asyncio.run(get_info(package_versions, parsed.repo))  # , parsed.jobs))
+    csl_items = asyncio.run(
+        get_info(package_versions, parsed.repo, parsed.date_accessed)
+    )  # , parsed.jobs))
     s = json.dumps([item.to_jso() for item in csl_items], indent=2, sort_keys=True)
 
     # if parsed.format.lower() == "json":
