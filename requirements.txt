@@ -3,7 +3,7 @@ jsonschema==3.2.0
 
 # dev
 
-setuptools==51.1.1
+setuptools==52.0.0
 wheel==0.36.2
 twine==3.3.0
 pre-commit==2.10.0
