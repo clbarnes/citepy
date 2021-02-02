@@ -1,9 +1,8 @@
-import httpx
 from datetime import datetime
 import logging
 
-from citepy.repos.common import DataFetcher, KNOWN_SITES as common_known, get_publisher
-from citepy.classes import CslItem, CslType, CslName
+from .common import DataFetcher, KNOWN_SITES as common_known, get_publisher
+from ..classes import CslItem, CslType, CslName
 
 
 KNOWN_SITES = common_known.copy()

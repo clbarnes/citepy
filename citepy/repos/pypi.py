@@ -1,9 +1,8 @@
-import httpx
 from datetime import datetime
 import logging
 
-from citepy.classes import CslItem, CslType, CslName
-from citepy.repos.common import KNOWN_SITES as common_known, get_publisher, DataFetcher
+from .common import KNOWN_SITES as common_known, get_publisher, DataFetcher
+from ..classes import CslItem, CslType, CslName
 
 KNOWN_SITES = common_known.copy()
 KNOWN_SITES.update({"pypi": "The Python Package Index"})
