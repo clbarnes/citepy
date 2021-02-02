@@ -37,16 +37,13 @@ def get_pypi_versions() -> Dict[str, Optional[str]]:
 
 def setup_logging(verbosity):
     verbosity = verbosity or 0
-    levels = [logging.INFO, logging.DEBUG, logging.NOTSET, logging.NOTSET]
-    v_idx = min(verbosity, len(levels) - 1)
+    levels = [logging.WARNING, logging.INFO, logging.DEBUG, logging.NOTSET]
+    logging.basicConfig(level=levels[min(verbosity, len(levels) - 1)])
 
-    logging.basicConfig(level=levels[v_idx])
-
-    if v_idx > 2:
-        logging.getLogger("pip").setLevel(logging.INFO)
-        logging.getLogger("urllib3").setLevel(logging.INFO)
-        logging.getLogger("websockets").setLevel(logging.INFO)
-        logging.getLogger("pyppeteer").setLevel(logging.INFO)
+    levels.insert(0, logging.CRITICAL)
+    loud_level = levels[min(verbosity, len(levels) - 1)]
+    for name in ["pip", "urllib3", "websockets"]:
+        logging.getLogger(name).setLevel(loud_level)
 
 
 def msg_template(e):
@@ -113,9 +110,36 @@ def outfile(obj):
             yield f
 
 
+@contextmanager
+def infile(obj):
+    if not obj or obj == "-":
+        yield sys.stdin
+    else:
+        with open(obj) as f:
+            yield f
+
+
 def parse_date(s: str) -> dt.date:
     datetime = dt.datetime.strptime(s, "%Y-%m-%d")
     return datetime.date()
+
+
+def read_packages(args):
+    if not args:
+        return
+    has_stdin = False
+    for arg in args:
+        if arg == "-":
+            if has_stdin:
+                continue
+            else:
+                has_stdin = True
+        with infile(arg) as f:
+            for line in f:
+                stripped = line.strip()
+                if not stripped or line.startswith("#"):
+                    continue
+                yield stripped
 
 
 def main():
@@ -149,7 +173,18 @@ def main():
         help="which package repository to use (default pypi)",
     )
     parser.add_argument(
-        "--output", "-o", help="path to write output to (default write to stdout)"
+        "--infile",
+        "-i",
+        action="append",
+        help=(
+            "path to read input packages from as newline-separated items "
+            "(can be given multiple times; - reads from stdin)"
+        ),
+    )
+    parser.add_argument(
+        "--outfile",
+        "-o",
+        help="path to write output to (default or - writes to stdout)",
     )
     # parser.add_argument(
     #     "--format",
@@ -195,6 +230,8 @@ def main():
         print(__version__)
         sys.exit(0)
 
+    parsed.package.extend(read_packages(parsed.infile))
+
     if parsed.repo == "pypi":
         versions = get_pypi_versions()
         if parsed.package:
@@ -221,8 +258,8 @@ def main():
     # else:
     #     raise ValueError(f"Unrecognised output format '{parsed.format}'")
 
-    with outfile(parsed.output) as f:
-        print(s, file=f, flush=True)
+    with outfile(parsed.outfile) as f:
+        print(s, file=f)
 
     sys.exit(0)
 
