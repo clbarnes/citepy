@@ -16,7 +16,7 @@ setup(
     author="Chris L. Barnes",
     author_email="cbarnes@mrc-lmb.cam.ac.uk",
     description="Automatically create citations for packages",
-    install_requires=["jsonschema", "httpx"],
+    install_requires=["jsonschema", "httpx", "beautifulsoup4"],
     package_data={"citepy": ["csl-data.json"]},
     long_description=long_description,
     long_description_content_type="text/markdown",
