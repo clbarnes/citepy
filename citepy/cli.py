@@ -2,7 +2,7 @@ import argparse
 import json
 import sys
 import logging
-from typing import Dict, Optional
+from typing import Dict, Optional, List, Any
 import re
 from contextlib import contextmanager
 from pip._internal.operations.freeze import freeze as pip_freeze
@@ -20,7 +20,7 @@ logger = logging.getLogger(__name__)
 
 DATE_ACCESSED_VAR = "CITEPY_DATE_ACCESSED"
 DEFAULT_DATE_STR = os.environ.get(DATE_ACCESSED_VAR, dt.date.today().isoformat())
-DEFAULT_JOBS = 5
+DEFAULT_DUMPER = "csl-json/pretty"
 
 
 def get_pypi_versions() -> Dict[str, Optional[str]]:
@@ -142,6 +142,29 @@ def read_packages(args):
                 yield stripped
 
 
+Jsos = List[Dict[str, Any]]
+
+
+def dump_csl_json_lines(items: Jsos, f):
+    for item in items:
+        print(json.dumps(item, sort_keys=True), file=f)
+
+
+def dump_csl_json_pretty(items: Jsos, f):
+    print(json.dumps(items, sort_keys=True, indent=2), file=f)
+
+
+def dump_csl_json_min(items: Jsos, f):
+    print(json.dumps(items), file=f)
+
+
+dumpers = {
+    "csl-json/lines": dump_csl_json_lines,
+    "csl-json/pretty": dump_csl_json_pretty,
+    "csl-json/min": dump_csl_json_min,
+}
+
+
 def main():
     parser = argparse.ArgumentParser()
     parser.add_argument(
@@ -186,20 +209,13 @@ def main():
         "-o",
         help="path to write output to (default or - writes to stdout)",
     )
-    # parser.add_argument(
-    #     "--format",
-    #     "-f",
-    #     default="csl-json",
-    #     choices=("csl-json",),
-    #     help="format to write out (default 'csl-json')",
-    # )
-    # parser.add_argument(
-    #     "--jobs",
-    #     "-j",
-    #     type=int,
-    #     default=DEFAULT_JOBS,
-    #     help=f"Number of concurrent requests to make (default {DEFAULT_JOBS})",
-    # )
+    parser.add_argument(
+        "--format",
+        "-f",
+        default=DEFAULT_DUMPER,
+        choices=sorted(dumpers),
+        help=f"format to write out (default '{DEFAULT_DUMPER}')",
+    )
     parser.add_argument(
         "--verbose",
         "-v",
@@ -247,21 +263,11 @@ def main():
     csl_items = asyncio.run(
         get_info(package_versions, parsed.repo, parsed.date_accessed)
     )  # , parsed.jobs))
-    s = json.dumps([item.to_jso() for item in csl_items], indent=2, sort_keys=True)
-
-    # if parsed.format.lower() == "json":
-    #     s = json.dumps(
-    #         [item.to_jso() for item in csl_items],
-    #         indent=2,
-    #         sort_keys=True
-    #     )
-    # else:
-    #     raise ValueError(f"Unrecognised output format '{parsed.format}'")
-
+    jsos = [item.to_jso() for item in csl_items]
     with outfile(parsed.outfile) as f:
-        print(s, file=f)
+        dumpers[parsed.format](jsos, f)
 
-    sys.exit(0)
+    parser.exit(0)
 
 
 if __name__ == "__main__":
