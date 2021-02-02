@@ -1,10 +1,8 @@
-
-import httpx
 from datetime import datetime
 import logging
 
-from citepy.classes import CslItem, CslType, CslName
-from citepy.repos.common import KNOWN_SITES as common_known, get_publisher, DataFetcher
+from ..classes import CslItem, CslType, CslName
+from .common import KNOWN_SITES as common_known, get_publisher, DataFetcher
 
 KNOWN_SITES = common_known.copy()
 KNOWN_SITES.update({"cran": "The Comprehensive R Archive Network"})
@@ -13,11 +11,7 @@ logger = logging.getLogger(__name__)
 
 
 class PypiDataFetcher(DataFetcher):
-    def __init__(
-        self, client: httpx.AsyncClient, base_url=" https://CRAN.R-project.org"
-    ):
-        self.client = client
-        self.base_url = base_url
+    base_url = "https://CRAN.R-project.org"
 
     def get_authors(self, info):
         author_str = info.get("author")
@@ -32,7 +26,7 @@ class PypiDataFetcher(DataFetcher):
 
         return authors
 
-    async def get(self, package, version=None) -> CslItem:
+    async def get(self, package, version=None, date_accessed=None) -> CslItem:
         url = self.base_url + "/" + package
         if version:
             url += "/" + version
@@ -71,7 +65,7 @@ class PypiDataFetcher(DataFetcher):
             # container=dt,
             # submitted=dt,
             original_date=first_upload,
-            accessed=datetime.utcnow(),
+            accessed=date_accessed,
             categories=(
                 ["software", "python", "libraries", "pypi"] + info["classifiers"]
             ),
