@@ -22,8 +22,9 @@ pip install --user citepy
 ## Usage
 
 ```help
-usage: citepy [-h] [--all-python] [--repo {crates,pypi}] [--output OUTPUT]
-              [--verbose] [--version]
+usage: citepy [-h] [--all-python] [--repo {crates,pypi}] [--infile INFILE]
+              [--outfile OUTFILE] [--verbose] [--date-accessed DATE_ACCESSED]
+              [--version]
               [package ...]
 
 positional arguments:
@@ -40,11 +41,20 @@ optional arguments:
                         accessible to `pip freeze`
   --repo {crates,pypi}, -r {crates,pypi}
                         which package repository to use (default pypi)
-  --output OUTPUT, -o OUTPUT
-                        path to write output to (default write to stdout)
+  --infile INFILE, -i INFILE
+                        path to read input packages from as newline-separated
+                        items (can be given multiple times; - reads from
+                        stdin)
+  --outfile OUTFILE, -o OUTFILE
+                        path to write output to (default or - writes to
+                        stdout)
   --verbose, -v         Increase verbosity of logging (can be repeated). One
                         for DEBUG, two for NOTSET, three includes all library
                         logging.
+  --date-accessed DATE_ACCESSED, -d DATE_ACCESSED
+                        Manually set access date, in format 'YYYY-MM-DD'.
+                        Falls back to CITEPY_DATE_ACCESSED environment
+                        variable, then today's date.
   --version             print version information and exit
 ```
 
@@ -75,9 +85,9 @@ citepy citepy
     "accessed": {
       "date-parts": [
         [
-          2020,
-          12,
-          3
+          2063,
+          4,
+          5
         ]
       ]
     },
@@ -118,6 +128,13 @@ citepy citepy
   }
 ]
 ```
+
+## Limitations
+
+- Author names are not parsed, and are therefore taken as literals
+    - This is a "wontfix". Author names *should* be literals. A huge amount of complexity is added to tools which attempt, and fail, to encode the complexity of different cultural conventions around handling names.
+- If the package has its own citation information (as numpy, scipy, astropy etc do), citepy will not pick it up - it just uses the package publication metadata
+- Software libraries do not fit into the CSL or bibtex categories very well, and so are cited as the web pages which host them
 
 ## Limitations
 
