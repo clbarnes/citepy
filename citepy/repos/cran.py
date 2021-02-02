@@ -89,7 +89,7 @@ class CranDataFetcher(DataFetcher):
                 version
             )
 
-        info_url = info.get("URL", url)
+        info_url = info.get("URL", url).split(" , ")[0]
 
         return CslItem(
             type=CslType.WEBPAGE,
