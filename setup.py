@@ -1,5 +1,7 @@
-from setuptools import setup
+#!/usr/bin/env python3
 from pathlib import Path
+
+from setuptools import setup
 
 here = Path(__file__).absolute().parent
 
