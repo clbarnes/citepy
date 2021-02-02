@@ -1,5 +1,8 @@
 from abc import ABC, abstractmethod
 from urllib.parse import urlparse
+
+import httpx
+
 from ..classes import CslItem
 
 KNOWN_SITES = {
@@ -28,6 +31,11 @@ def get_publisher(url, known_sites=None):
 
 
 class DataFetcher(ABC):
+    base_url: str
+
+    def __init__(self, client: httpx.AsyncClient) -> None:
+        self.client = client
+
     @abstractmethod
     async def get(self, package, version=None) -> CslItem:
         pass

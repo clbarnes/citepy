@@ -14,9 +14,7 @@ logger = logging.getLogger(__name__)
 
 
 class CratesDataFetcher(DataFetcher):
-    def __init__(self, client: httpx.AsyncClient, base_url="https://www.crates.io"):
-        self.client = client
-        self.base_url = base_url
+    base_url = "https://www.crates.io"
 
     async def get_date_author(self, version_dict):
         issued = datetime.fromisoformat(version_dict["created_at"])

@@ -12,9 +12,7 @@ logger = logging.getLogger(__name__)
 
 
 class PypiDataFetcher(DataFetcher):
-    def __init__(self, client: httpx.AsyncClient, base_url="https://www.pypi.org/pypi"):
-        self.client = client
-        self.base_url = base_url
+    base_url = "https://www.pypi.org/pypi"
 
     def get_authors(self, info):
         author_str = info.get("author")
