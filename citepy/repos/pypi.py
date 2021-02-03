@@ -11,7 +11,7 @@ logger = logging.getLogger(__name__)
 
 
 class PypiDataFetcher(DataFetcher):
-    base_url = "https://www.pypi.org/pypi"
+    base_url = "https://pypi.org/pypi"
 
     def get_authors(self, info):
         author_str = info.get("author")

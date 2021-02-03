@@ -1,8 +1,12 @@
+#!/usr/bin/env python
+"""
+Fetch citation data from software package repositories.
+"""
 import argparse
 import json
 import sys
 import logging
-from typing import Dict, Optional, List, Any
+from typing import Dict, Optional, Iterable
 import re
 from contextlib import contextmanager
 from pip._internal.operations.freeze import freeze as pip_freeze
@@ -13,8 +17,9 @@ import os
 
 import httpx
 
-from citepy import __version__
-from citepy.repos import KNOWN_FETCHERS
+from . import __version__
+from .repos import KNOWN_FETCHERS
+from .classes import CslItem
 
 logger = logging.getLogger(__name__)
 
@@ -37,19 +42,18 @@ def get_pypi_versions() -> Dict[str, Optional[str]]:
 
 def setup_logging(verbosity):
     verbosity = verbosity or 0
-    levels = [logging.WARNING, logging.INFO, logging.DEBUG, logging.NOTSET]
-    logging.basicConfig(level=levels[min(verbosity, len(levels) - 1)])
+    levels = [
+        logging.CRITICAL,
+        logging.WARNING,
+        logging.INFO,
+        logging.DEBUG,
+        logging.NOTSET,
+    ]
+    logging.basicConfig(level=levels[min(verbosity + 1, len(levels) - 1)])
 
-    levels.insert(0, logging.CRITICAL)
     loud_level = levels[min(verbosity, len(levels) - 1)]
     for name in ["pip", "urllib3", "websockets"]:
         logging.getLogger(name).setLevel(loud_level)
-
-
-def msg_template(e):
-    return "Could not get citation for package '%s'\n" + textwrap.indent(
-        str(e), " " * 4
-    )
 
 
 name_re = re.compile(
@@ -142,20 +146,19 @@ def read_packages(args):
                 yield stripped
 
 
-Jsos = List[Dict[str, Any]]
-
-
-def dump_csl_json_lines(items: Jsos, f):
+def dump_csl_json_lines(items: Iterable[CslItem], f):
     for item in items:
-        print(json.dumps(item, sort_keys=True), file=f)
+        print(json.dumps(item.to_jso(), sort_keys=True), file=f)
 
 
-def dump_csl_json_pretty(items: Jsos, f):
-    print(json.dumps(items, sort_keys=True, indent=2), file=f)
+def dump_csl_json_pretty(items: Iterable[CslItem], f):
+    json.dump([item.to_jso() for item in items], f, sort_keys=True, indent=2)
 
 
-def dump_csl_json_min(items: Jsos, f):
-    print(json.dumps(items), file=f)
+def dump_csl_json_min(items: Iterable[CslItem], f):
+    json.dump(
+        [item.to_jso() for item in items], f, sort_keys=True, separators=(",", ":")
+    )
 
 
 dumpers = {
@@ -166,17 +169,18 @@ dumpers = {
 
 
 def main():
-    parser = argparse.ArgumentParser()
+    parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument(
         "package",
         nargs="*",
         help=(
             "names of packages you want to cite, "
             "optionally with (full) version string. "
-            "e.g. numpy==1.16.3 beautifulsoup4==4.7.1 . "
+            "e.g. 'numpy==1.16.3' 'beautifulsoup4==4.7.1' . "
             "Note that version strings are handled differently "
             "by different repositories, and may be ignored. "
-            "In particular, any non-exact version constraint is ignored."
+            "In particular, any non-exact version constraint is ignored. "
+            "'-' will read a newline-separated list from stdin."
         ),
     )
     parser.add_argument(
@@ -220,8 +224,7 @@ def main():
         "--verbose",
         "-v",
         action="count",
-        help="Increase verbosity of logging (can be repeated). "
-        "One for DEBUG, two for NOTSET, three includes all library logging.",
+        help="Increase verbosity of logging (can be repeated).",
     )
     parser.add_argument(
         "--date-accessed",
@@ -262,10 +265,9 @@ def main():
 
     csl_items = asyncio.run(
         get_info(package_versions, parsed.repo, parsed.date_accessed)
-    )  # , parsed.jobs))
-    jsos = [item.to_jso() for item in csl_items]
+    )
     with outfile(parsed.outfile) as f:
-        dumpers[parsed.format](jsos, f)
+        dumpers[parsed.format](csl_items, f)
 
     parser.exit(0)
 
