@@ -9,7 +9,7 @@ wheel==0.36.2
 twine==3.3.0
 pre-commit==2.10.0
 flake8==3.8.4
-mypy==0.800
+mypy==0.812
 bump2version==1.0.1
 black
 pipe2codeblock==1.0.0
