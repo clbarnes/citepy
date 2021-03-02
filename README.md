@@ -130,7 +130,8 @@ citepy citepy
     "type": "webpage",
     "version": "0.4.0"
   }
-]```
+]
+```
 
 ## Limitations
 
