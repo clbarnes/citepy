@@ -10,7 +10,6 @@ from typing import Dict, Optional, Iterable
 import re
 from contextlib import contextmanager
 from pip._internal.operations.freeze import freeze as pip_freeze
-import textwrap
 import asyncio
 import datetime as dt
 import os
