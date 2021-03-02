@@ -28,13 +28,16 @@ usage: citepy [-h] [--all-python] [--repo {cran,crates,pypi}]
               [--verbose] [--date-accessed DATE_ACCESSED] [--version]
               [package ...]
 
+Fetch citation data from software package repositories.
+
 positional arguments:
   package               names of packages you want to cite, optionally with
-                        (full) version string. e.g. numpy==1.16.3
-                        beautifulsoup4==4.7.1 . Note that version strings are
-                        handled differently by different repositories, and may
-                        be ignored. In particular, any non-exact version
-                        constraint is ignored.
+                        (full) version string. e.g. 'numpy==1.16.3'
+                        'beautifulsoup4==4.7.1' . Note that version strings
+                        are handled differently by different repositories, and
+                        may be ignored. In particular, any non-exact version
+                        constraint is ignored. '-' will read a newline-
+                        separated list from stdin.
 
 optional arguments:
   -h, --help            show this help message and exit
@@ -51,9 +54,7 @@ optional arguments:
                         stdout)
   --format {csl-json/lines,csl-json/min,csl-json/pretty}, -f {csl-json/lines,csl-json/min,csl-json/pretty}
                         format to write out (default 'csl-json/pretty')
-  --verbose, -v         Increase verbosity of logging (can be repeated). One
-                        for DEBUG, two for NOTSET, three includes all library
-                        logging.
+  --verbose, -v         Increase verbosity of logging (can be repeated).
   --date-accessed DATE_ACCESSED, -d DATE_ACCESSED
                         Manually set access date, in format 'YYYY-MM-DD'.
                         Falls back to CITEPY_DATE_ACCESSED environment
@@ -127,10 +128,9 @@ citepy citepy
     "publisher": "GitHub",
     "title": "citepy",
     "type": "webpage",
-    "version": "0.3.2"
+    "version": "0.4.0"
   }
-]
-```
+]```
 
 ## Limitations
 
@@ -145,4 +145,5 @@ citepy citepy
     - This is a "wontfix". Author names *should* be literals. A huge amount of complexity is added to tools which attempt, and fail, to encode the complexity of different cultural conventions around handling names.
 - If the package has its own citation information (as numpy, scipy, astropy etc do), citepy will not pick it up - it just uses the package publication metadata
 - Software libraries do not fit into the CSL or bibtex categories very well, and so are cited as the web pages which host them
+
 
