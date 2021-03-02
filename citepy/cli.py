@@ -152,12 +152,14 @@ def dump_csl_json_lines(items: Iterable[CslItem], f):
 
 def dump_csl_json_pretty(items: Iterable[CslItem], f):
     json.dump([item.to_jso() for item in items], f, sort_keys=True, indent=2)
+    f.write("\n")
 
 
 def dump_csl_json_min(items: Iterable[CslItem], f):
     json.dump(
         [item.to_jso() for item in items], f, sort_keys=True, separators=(",", ":")
     )
+    f.write("\n")
 
 
 dumpers = {
