@@ -140,11 +140,3 @@ citepy citepy
 - If the package has its own citation information (as numpy, scipy, astropy etc do), citepy will not pick it up - it just uses the package publication metadata
 - Software libraries do not fit into the CSL or bibtex categories very well, and so are cited as the web pages which host them
 
-## Limitations
-
-- Author names are not parsed, and are therefore taken as literals
-    - This is a "wontfix". Author names *should* be literals. A huge amount of complexity is added to tools which attempt, and fail, to encode the complexity of different cultural conventions around handling names.
-- If the package has its own citation information (as numpy, scipy, astropy etc do), citepy will not pick it up - it just uses the package publication metadata
-- Software libraries do not fit into the CSL or bibtex categories very well, and so are cited as the web pages which host them
-
-
