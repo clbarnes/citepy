@@ -4,10 +4,10 @@ beautifulsoup4==4.9.3
 
 # dev
 
-setuptools==54.0.0
+setuptools==57.0.0
 wheel==0.36.2
 twine==3.3.0
-pre-commit==2.10.1
+pre-commit==2.13.0
 flake8==3.9.2
 mypy==0.812
 bump2version==1.0.1
